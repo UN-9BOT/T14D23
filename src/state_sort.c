@@ -15,24 +15,26 @@ void menu(int n) {
     int flag = 0;
     char *path = input(&flag);
     FILE *fp;
-    if ((fp = fopen(path, "r")) == NULL) { flag = 1; }
-    if (!flag) {
-    fclose(fp);
-    switch (n) {
-        case 0:
-            scanFile(path);
-            break;
-        case 1:
-            sortFile(path);
-            scanFile(path);
-            break;
-        case 2:
-            addLine(path);
-            sortFile(path);
-            scanFile(path);
-            break;
+    if ((fp = fopen(path, "r")) == NULL) {
+        flag = 1;
     }
-    free(path);
+    if (!flag) {
+        fclose(fp);
+        switch (n) {
+            case 0:
+                scanFile(path);
+                break;
+            case 1:
+                sortFile(path);
+                scanFile(path);
+                break;
+            case 2:
+                addLine(path);
+                sortFile(path);
+                scanFile(path);
+                break;
+        }
+        free(path);
     } else {
         printf("n/a");
     }
