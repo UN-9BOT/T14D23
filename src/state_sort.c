@@ -14,10 +14,12 @@ typedef struct line {
 
 void menu(int choice);
 char *input();
-void prFile(char *path);
+void scanFile(char *path);
 void sortFile(char *path);
 void addLine(char *path);
-/* void destroy(Line **data, int counterStruct); */
+void swap(FILE * fp, Line index1, Line index2, int n1, int n2);
+void write(FILE *fp, Line* data, int index);
+Line readRecord(FILE *fp, int index);
 
 
 int main(void) {
@@ -35,9 +37,10 @@ void menu(int n) {
     char *path = input();
     switch (n) {
         case 0:
-            prFile(path);
+            scanFile(path);
             break;
         case 1:
+            sortFile(path);
 
             break;
         case 2:
@@ -53,42 +56,85 @@ char *input() {
     return (path);
 }
 
-void prFile(char *path) {
+void scanFile(char *path) {
     FILE *fp = fopen(path, "rb");
-    int counterStruct = 0;
-    Line *data = (Line *)malloc(sizeof(Line) * 5000);
-    /* Line value; */
+    Line value;
+    /* fseek(fp, SEEK_CUR, SEEK_END); */
+    /* printf("%ld", ftell(fp)/sizeof(Line)); */
 
-    while (fread(&data[counterStruct], sizeof(Line), 1, fp)) {
-        printf("%d %d %d %d %d %d %d %d\n", data[counterStruct].year, data[counterStruct].month,
-               data[counterStruct].day, data[counterStruct].hour, data[counterStruct].min,
-               data[counterStruct].sec, data[counterStruct].status, data[counterStruct].code);
+    while (fread(&value, sizeof(Line), 1, fp)) {
+        printf("%d %d %d %d %d %d %d %d\n", value.year, value.month,
+               value.day, value.hour, value.min,
+               value.sec, value.status, value.code);
     }
-
-    /* while (fread(&value, sizeof(Line), 1, fp)) { */
-    /*     data[counterStruct] = malloc(sizeof(Line)); */
-    /*     data[counterStruct]->year = value.year; */
-    /*     data[counterStruct]->month = value.month; */
-    /*     data[counterStruct]->day = value.day; */
-    /*     data[counterStruct]->hour = value.hour; */
-    /*     data[counterStruct]->min = value.min; */
-    /*     data[counterStruct]->sec = value.sec; */
-    /*     data[counterStruct]->status = value.status; */
-    /*     data[counterStruct]->code = value.code; */
-    /*     printf("%d %d %d %d %d %d %d %d\n", data[counterStruct]->year, data[counterStruct]->month, */
-    /*            data[counterStruct]->day, data[counterStruct]->hour, data[counterStruct]->min, */
-    /*            data[counterStruct]->sec, data[counterStruct]->status, data[counterStruct]->code); */
-    /* } */
     fclose(fp);
-    free(data);
-    /* destroy(data, counterStruct); */
-    
 }
 
-/* void destroy(Line **data, int counterStruct) { */
-/*     while (counterStruct-- != 0) { */
-/*         free(data[counterStruct]); */
-/*     } */
-/*     free(data); */
-/* } */
+int fifle(Line rec1, Line rec2) {
+    int total = 0;
+    int *ptr1 = &(rec1.year);
+    int *ptr2 = &(rec2.year);
+    for(int i = 0; i < 6; i++) {
+        if (*ptr1 > *ptr2) {
+            total = 1;
+        }
+        if (*ptr1 < *ptr2) {
+            total = -1;
+        }
+        ptr1++;
+        ptr2++;
+    }
+    return (total);
+}
+        
+void sortFile(char *path) {
+    FILE *fp = fopen(path, "rb+");
+    // Line value;
+    // Line next;
+    // int offset = sizeof(Line);
 
+    fseek(fp, SEEK_CUR, SEEK_END);
+    int size = ftell(fp)/sizeof(Line);
+    int counter = 0;
+    Line first;
+    Line second;
+    for (int i = 0; i < size; i++) {
+        int j = 0;
+        while (j < size - 1) {
+            fseek(fp, sizeof(Line) * j, SEEK_SET);
+            fread(&first, sizeof(Line), 1, fp);
+            fread(&second, sizeof(Line), 1, fp);
+            int total = fifle(first, second);
+            printf("%d\n", total);
+            if (total == 1) {
+                swap(fp, first, second, j, j + 1);
+            }
+            j++;
+        }
+    }
+            
+
+    printf("%d\n", counter);
+    fclose(fp);
+
+    /* while (fread(&value, sizeof(Line), 1, fp)) { */
+    /* } */
+}
+
+Line readRecord(FILE *fp, int index) {
+    int offset = index * sizeof(Line);
+
+    fseek(fp, offset, SEEK_SET);
+    Line record;
+    fread(&record, sizeof(Line), 1, fp);
+    rewind(fp);
+    return (record);
+}
+
+
+void swap(FILE * fp, Line first, Line second, int index1, int index2) {
+    fseek(fp, index1 * sizeof(Line), SEEK_SET);
+    fwrite(&second, sizeof(Line), 0, fp);
+    fseek(fp, index2 * sizeof(Line), SEEK_SET);
+    fwrite(&first, sizeof(Line), 0, fp);
+}
