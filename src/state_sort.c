@@ -15,10 +15,11 @@ void menu(int n) {
     int flag = 0;
     char *path = input(&flag);
     FILE *fp;
+    int fl = 0;
     if ((fp = fopen(path, "r")) == NULL) {
-        flag = 1;
+        fl = 1;
     }
-    if (!flag) {
+    if (!fl) {
         fclose(fp);
         switch (n) {
             case 0:
@@ -37,11 +38,15 @@ void menu(int n) {
         free(path);
     } else {
         printf("n/a");
+        if (!flag) {
+            free(path);
+        }
     }
+    fclose(fp);
 }
 
 void addLine(char *path) {
-    FILE *fp = fopen(path, "a");
+    FILE *fp = fopen(path, "ab");
     Line value;
     int *ptr = &(value.year);
     for (int i = 0; i < 8; ptr++, i++) {

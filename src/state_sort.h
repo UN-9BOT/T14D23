@@ -17,6 +17,6 @@ char *input(int *flag);
 void scanFile(char *path);
 void sortFile(char *path);
 void addLine(char *path);
-void swap(FILE *fp, Line index1, Line index2, int n1, int n2);
+void swap(FILE *fp, Line first, Line second, int index1, int index2);
 void write(FILE *fp, Line *data, int index);
 #endif
