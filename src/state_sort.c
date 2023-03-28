@@ -1,24 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-typedef struct line {
-    int year;
-    int month;
-    int day;
-    int hour;
-    int min;
-    int sec;
-    int status;
-    int code;
-} Line;
-
-void menu(int choice);
-char *input();
-void scanFile(char *path);
-void sortFile(char *path);
-void addLine(char *path);
-void swap(FILE *fp, Line index1, Line index2, int n1, int n2);
-void write(FILE *fp, Line *data, int index);
+#include "state_sort.h"
 
 int main(void) {
     int n, trash;
@@ -32,7 +12,12 @@ int main(void) {
 }
 
 void menu(int n) {
-    char *path = input();
+    int flag = 0;
+    char *path = input(&flag);
+    FILE *fp;
+    if ((fp = fopen(path, "r")) == NULL) { flag = 1; }
+    if (!flag) {
+    fclose(fp);
     switch (n) {
         case 0:
             scanFile(path);
@@ -48,6 +33,9 @@ void menu(int n) {
             break;
     }
     free(path);
+    } else {
+        printf("n/a");
+    }
 }
 
 void addLine(char *path) {
@@ -61,9 +49,9 @@ void addLine(char *path) {
     fclose(fp);
 }
 
-char *input() {
+char *input(int *flag) {
     char *path = malloc(sizeof(char) * 250);
-    scanf("%249s", path);
+    (path == NULL) ? *flag = 1 : scanf("%249s", path);
     return (path);
 }
 
@@ -96,11 +84,10 @@ int fifle(Line first, Line second) {
 
 void sortFile(char *path) {
     FILE *fp = fopen(path, "rb+");
+    Line first, second;
 
     fseek(fp, SEEK_CUR, SEEK_END);
     int size = ftell(fp) / sizeof(Line);
-    Line first;
-    Line second;
     fseek(fp, SEEK_CUR, SEEK_SET);
     for (int i = 0; i < size; i++) {
         int j = 0;
