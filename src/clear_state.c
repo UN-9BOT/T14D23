@@ -31,18 +31,14 @@ int main(void) {
         temp = fopen("temp", "wb");
 
         if (!getDate(&da1, &mo1, &ye1, &da2, &mo2, &ye2)) {
-            int flagS = 1;
             while (fread(&value, sizeof(Line), 1, fp)) {
-                if (!inDate(da1, mo1 - 1, ye1 - 2, da2, mo2 - 1, ye2 - 1, value.day, value.month - 1,
-                            value.year - 1)) {
+                if (!inDate(da1, mo1, ye1, da2, mo2, ye2, value.day, value.month, value.year)) {
                     fwrite(&value, sizeof(Line), 1, temp);
+                    /* printf("%d %d %d\n", value.year, value.month, value.day); */
                 };
             }
-            if (flagS) {
-                printf("n/a");
-            }
         } else {
-            printf("n/aa");
+            printf("n/a");
         }
         fclose(fp);
         fclose(temp);
@@ -86,20 +82,30 @@ int inDate(int da1, int mo1, int ye1, int da2, int mo2, int ye2, int da, int mo,
     struct tm info;
 
     info1.tm_year = ye1;
-    info1.tm_mon = mo1;
+    info1.tm_mon = mo1 - 1;
     info1.tm_mday = da1;
+    info1.tm_sec = 0;
+    info1.tm_min = 0;
+    info1.tm_hour = 0;
 
     info2.tm_year = ye2;
-    info2.tm_mon = mo2;
+    info2.tm_mon = mo2 - 1;
     info2.tm_mday = da2;
+    info2.tm_sec = 0;
+    info2.tm_min = 0;
+    info2.tm_hour = 0;
 
     info.tm_year = ye;
-    info.tm_mon = mo;
+    info.tm_mon = mo - 1;
     info.tm_mday = da;
+    info.tm_sec = 0;
+    info.tm_min = 0;
+    info.tm_hour = 0;
 
     long i = mktime(&info);
     long i1 = mktime(&info1);
     long i2 = mktime(&info2);
+    /* printf("%ld %ld\n", i1, i2); */
     if (i >= i1 && i <= i2) {
         res = 1;
     }
