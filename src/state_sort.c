@@ -97,8 +97,7 @@ void sortFile(char *path) {
     int size = ftell(fp) / sizeof(Line);
     fseek(fp, SEEK_CUR, SEEK_SET);
     for (int i = 0; i < size; i++) {
-        int j = 0;
-        while (j < size - 1) {
+        for (int j = 0; j < size - 1; j++) {
             fseek(fp, sizeof(Line) * j, SEEK_SET);
             fread(&first, sizeof(Line), 1, fp);
             fread(&second, sizeof(Line), 1, fp);
@@ -106,7 +105,6 @@ void sortFile(char *path) {
             if (total == 1) {
                 swap(fp, first, second, j, j + 1);
             }
-            j++;
         }
     }
     fclose(fp);
